@@ -1,5 +1,5 @@
 ## v 1.0 April 27 2017
-## https://github.com/vdudejon/Powershell/blob/master/Add-OMCustomProperty.psm1
+## https://github.com/vdudejon/Powershell/blob/master/vROps/Add-OMCustomProperty.psm1
 
 function Add-OMCustomProperty {
 	param($objname, $propname, $propvalue)
