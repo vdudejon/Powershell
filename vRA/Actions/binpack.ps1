@@ -2,7 +2,7 @@ function handler($context, $inputs) {
  
   
     function Update-CouchHost($couchdbhost) {
-        Invoke-WebRequest -uri "$dbserver:6984/hpccapacity/$($couchdbhost.id)?rev=$($couchdbhost._rev)" -Method Put -Headers $Headers -Body ($couchdbhost | ConvertTo-Json)
+        Invoke-WebRequest -uri "$couchdbserver:6984/hpccapacity/$($couchdbhost.id)?rev=$($couchdbhost._rev)" -Method Put -Headers $Headers -Body ($couchdbhost | ConvertTo-Json)
     }
     
     function Get-FreeCouchHost($sku){
@@ -22,7 +22,7 @@ function handler($context, $inputs) {
         }
 "@
         write-host "Query $query"
-        $dbhosts = (Invoke-WebRequest -uri "$dbserver:6984/hpccapacity/_find" -Headers $Headers -Method Post -Body $query -ContentType "application/json").Content
+        $dbhosts = (Invoke-WebRequest -uri "$couchdbserver:6984/hpccapacity/_find" -Headers $Headers -Method Post -Body $query -ContentType "application/json").Content
         $dbhosts = $dbhosts | ConvertFrom-Json | Select-Object -ExpandProperty docs
         return $dbhosts
     }
@@ -31,7 +31,7 @@ function handler($context, $inputs) {
     $outputs = $inputs
     
     # CouchDB Creds
-    $dbserver = ""
+    $couchdbserver = ""
     $user = $context.getSecret($inputs.couchuser)
     $pass = $context.getSecret($inputs.couchpass)
     $pair = "$($user):$($pass)"
