@@ -5,3 +5,7 @@ Finds an avaiable ESXi host in a couchdb database, then marks it as reserved and
 
 ## Un-Binpack.ps1
 Based on vRA destoy VM action, finds the ESXi host assigned to the VM and marks it as free.  Also sets an end time for the VM in the billing database
+ 
+## Set-Billing.ps1
+Set a start time for the VM in the billing database
+ 
