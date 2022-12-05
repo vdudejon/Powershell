@@ -1,0 +1,42 @@
+---
+- name: SLURMIFY a cluster of VMs
+  hosts: all
+  gather_facts: yes
+  tasks:
+  - name: Create directory /var/log/slurm
+    file:
+      path: /var/log/slurm
+      state: directory
+      owner: slurm
+      group: slurm
+  - name: Set slurm.conf file
+    become: true
+    template:
+     src: slurm.conf.j2
+     dest: /etc/slurm/slurm.conf
+     owner: root
+     group: root
+     mode: 0644
+  - name: update /etc/hosts file
+    become: true
+    template:
+      dest: /etc/hosts
+      src: hosts.j2
+      owner: root
+      group: root
+      mode: 0644
+  - name: Update nodes.conf file
+    become: true
+    blockinfile:
+      dest: /etc/slurm/nodes.conf
+      create: yes
+      content: "{{ lookup('template', 'nodes.conf.j2') }}"
+      state: present
+  - name: Enable and start service munge
+    ansible.builtin.service:
+      name: munge
+      enabled: yes
+      state: started
+- import_playbook: compute.yml
+- import_playbook: gpu.yml
+- import_playbook: login.yml

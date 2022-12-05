@@ -1,0 +1,38 @@
+---
+- name: Mount Powerscale share
+  gather_facts: no
+  hosts: all
+  tasks:
+  - name: Create symlink for /home
+    file:
+      src: /mnt/powerscale/home
+      dest: /home
+      state: link
+      force: yes
+  - name: Install AutoFS
+    become: true
+    dnf:
+      state: present
+      name:
+       - autofs
+  - name: Set auto.master file
+    become: true
+    template:
+     src: auto.master.j2
+     dest: /etc/auto.master
+     owner: root
+     group: root
+     mode: 0644
+  - name: Set auto.misc file
+    become: true
+    template:
+     src: auto.misc.j2
+     dest: /etc/auto.misc
+     owner: root
+     group: root
+     mode: 0644
+  - name: Start and enable autofs
+    ansible.builtin.service:
+      name: autofs
+      state: started
+      enabled: yes

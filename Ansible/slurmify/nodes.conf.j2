@@ -1,0 +1,9 @@
+{% for item in ansible_play_batch %}
+{% if 'compute' in item %}
+NodeName={{ item.split("-")[1] | lower }} Sockets={{ hostvars[item]['ansible_processor_count'] }} CoresPerSocket={{ hostvars[item]['ansible_processor_cores'] }} ThreadsPerCore=1 State=IDLE
+{% elif 'gpu' in item %}
+NodeName={{ item.split("-")[1] | lower }} State=IDLE
+{% elif 'login' in item %}
+ControlMachine={{ item.split("-")[1] | lower }}
+{% endif %}
+{% endfor %}

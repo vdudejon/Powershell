@@ -1,0 +1,39 @@
+- name: Common server configuration
+  hosts: all
+  gather_facts: no
+  tasks:
+  - name: Update sshd_config to allow *
+    become: true
+    blockinfile:
+      dest: /etc/ssh/ssh_config
+      create: no
+      content: "{{ lookup('template', 'ssh_config.j2') }}"
+      state: present  
+  - name: Set sysctl.conf file
+    become: true
+    blockinfile:
+      content: "{{ lookup('template', 'sysctl.conf.j2') }}"
+      dest: /etc/sysctl.conf
+      create: yes
+  - name: Set motd
+    ansible.builtin.template:
+      src: motd.j2
+      dest: /etc/motd 
+  - name: Change hostname to remove account number
+    ansible.builtin.hostname:
+      name: "{{ inventory_hostname.split('-')[1] }}"
+  - name: Remove /home
+    ansible.builtin.file:
+      path: /home
+      state: absent      
+  - name: Create symlink for /home
+    file:
+      src: /mnt/powerscale/home
+      dest: /home
+      state: link      
+      force: yes
+- import_playbook: repos.yml
+- import_playbook: chrony.yml
+- import_playbook: autofs.yml
+- import_playbook: login.yml
+- import_playbook: compute.yml
