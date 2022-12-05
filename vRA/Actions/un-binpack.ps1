@@ -29,7 +29,7 @@ function handler($context, $inputs) {
         "execution_stats": true
     }
 "@
-    $couchhost = (Invoke-WebRequest -uri "https://t01-couchdb01.las.r-hpc.com:6984/hpccapacity/_find" -Headers $Headers -AllowUnencryptedAuthentication -Method Post -Body $query -ContentType "application/json").Content
+    $couchhost = (Invoke-WebRequest -uri "$couchdbserver:6984/hpccapacity/_find" -Headers $Headers -AllowUnencryptedAuthentication -Method Post -Body $query -ContentType "application/json").Content
     $couchhost = $couchhost | ConvertFrom-Json | Select-Object -ExpandProperty docs
     write-host "Debug: Couch host is:"
     write-host $couchhost
@@ -39,7 +39,7 @@ function handler($context, $inputs) {
         $couchhost.vmname = ""
         $couchhost.reservedstate = "Free"
     
-        $res = Invoke-WebRequest -uri "https://t01-couchdb01.las.r-hpc.com:6984/hpccapacity/$($couchhost.id)?rev=$($couchhost._rev)" -Method Put -Headers $Headers -AllowUnencryptedAuthentication -Body ($couchhost | ConvertTo-Json)
+        $res = Invoke-WebRequest -uri "$couchdbserver:6984/hpccapacity/$($couchhost.id)?rev=$($couchhost._rev)" -Method Put -Headers $Headers -AllowUnencryptedAuthentication -Body ($couchhost | ConvertTo-Json)
     }
     
     # Stop billing
@@ -48,7 +48,7 @@ function handler($context, $inputs) {
     $vm | Add-Member -NotePropertyName "totalTime" -NotePropertyValue ($vm.endTime - $vm.startTime)
     Write-host "Debug: VM is $vm"
     $month = Get-Date -Format yyyy-MM
-    $res = Invoke-WebRequest -uri "https://t01-couchdb01.las.r-hpc.com:6984/billing-$month/$($inputs.resourceIds[0])?rev=$($vm._rev)" -Method Put -Headers $Headers -Body ($vm | Select-Object -Property * -ExcludeProperty _rev | ConvertTo-Json)
+    $res = Invoke-WebRequest -uri "$couchdbserver:6984/billing-$month/$($inputs.resourceIds[0])?rev=$($vm._rev)" -Method Put -Headers $Headers -Body ($vm | Select-Object -Property * -ExcludeProperty _rev | ConvertTo-Json)
     
     
     #Send event to log insight
