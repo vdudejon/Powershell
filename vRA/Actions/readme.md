@@ -8,4 +8,6 @@ Based on vRA destoy VM action, finds the ESXi host assigned to the VM and marks 
  
 ## Set-Billing.ps1
 Set a start time for the VM in the billing database
- 
+
+## Set-VMName.ps1
+Create names for VMs that look neat and are in order, for example hpc001-hpc005
